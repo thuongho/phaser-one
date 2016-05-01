@@ -54,7 +54,6 @@
 
       // group of space objects
       var spaceTypes = [
-        {key: 'star', text: 'STAR'},
         {key: 'blackhole-color', text: 'WORMHOLE'},
         {key: 'comet', text: 'COMET'},
         {key: 'meteor', text: 'METEOR'},
@@ -112,7 +111,19 @@
       // this.star.angle += 0.5;
     },
     changeSpaceObject: function(sprite, event) {
-      console.log('change space object');
+      var newObject, endX;
+
+      if (sprite.customParams.direction > 0) {
+        newObject = this.spaceObjectsGroup.next();
+        endX = 640 + this.currentSpaceObject.width/2; // put the obj completely out of the pix
+      } else {
+        newObject = this.spaceObjectsGroup.previous();
+        endX = -this.currentSpaceObject.width/2;
+      }
+
+      this.currentSpaceObject.x = endX;  // current object at final destination
+      newObject.x = this.game.world.centerX;
+      this.currentSpaceObject = newObject;
     },
     animateSpaceObject: function(sprite, event) {
       console.log('animate space object');
