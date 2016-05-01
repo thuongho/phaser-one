@@ -46,6 +46,7 @@
       // rotation starts from top left, to rotate from center anchor.setTo(0.5)
       // .angle = -45 45 degree counter
       this.star.anchor.setTo(0.5);
+      // this.star.tint = 0xFF0000;
 
       // enable user input on star
       this.star.inputEnabled = true;
@@ -109,17 +110,32 @@
     update: function() {  // running multple time per sec to get input
       // can make star constantly rotate
       // this.star.angle += 0.5;
+      // this.star.tint = 0xFF0000;
     },
     changeSpaceObject: function(sprite, event) {
       var newObject, endX;
 
       if (sprite.customParams.direction > 0) {
         newObject = this.spaceObjectsGroup.next();
+        // make the object come back in the screen from the correct position
+        newObject.x = -newObject.width/2; 
         endX = 640 + this.currentSpaceObject.width/2; // put the obj completely out of the pix
       } else {
         newObject = this.spaceObjectsGroup.previous();
+        newObject.x = 640 + newObject.width/2;
         endX = -this.currentSpaceObject.width/2;
       }
+
+      // tween is adding transition over time
+      // alpha for opacity
+      var newObjectMovement = game.add.tween(newObject);
+      // default is 1000 1 sec
+      newObjectMovement.to({x: this.game.world.centerX}, 1000);
+      newObjectMovement.start();
+
+      var currentSpaceMovement = game.add.tween(this.currentSpaceObject);
+      currentSpaceMovement.to({x: endX}, 1000);
+      currentSpaceMovement.start();
 
       this.currentSpaceObject.x = endX;  // current object at final destination
       newObject.x = this.game.world.centerX;
