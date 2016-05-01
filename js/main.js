@@ -11,10 +11,16 @@
     // all image loaded
     preload: function() {
       this.load.image('background', 'assets/images/earth_640x360.jpg');
-      this.load.image('star', 'assets/images/star-small.png');
       this.load.image('arrow', 'assets/images/arrow.png');
+      this.load.image('star', 'assets/images/star-small.png');
+      this.load.image('blackhole-color', 'assets/images/blackhole-color.png');
+      this.load.image('comet', 'assets/images/komet_lexell.png');
+      this.load.image('meteor', 'assets/images/meteor.png');
+      this.load.image('blackhole', 'assets/images/blackhole_trans.png');
     },
     create: function() {
+      var self = this;
+      var cosmic;
       // this.scale is a scale manager
       // Phaser.ScaleManager.SHOW_ALL - this allows scaling while keeping aspect ratio
       this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -45,6 +51,34 @@
       this.star.inputEnabled = true;
       // this.star.input.pixelPerfectClick = true;
       this.star.events.onInputDown.add(this.animateSpaceObject, this);
+
+      // group of space objects
+      var spaceTypes = [
+        {key: 'star', text: 'STAR'},
+        {key: 'blackhole-color', text: 'WORMHOLE'},
+        {key: 'comet', text: 'COMET'},
+        {key: 'meteor', text: 'METEOR'},
+        {key: 'blackhole', text: 'BLACKHOLE'}
+      ];
+
+      // create a new group
+      this.spaceObjectsGroup = this.game.add.group();
+
+      spaceTypes.forEach(function(spaceType) {
+        // -1000 to make the objects be out of screen
+        cosmic = self.spaceObjectsGroup.create(-1000, self.game.world.centerY, spaceType.key);
+
+        cosmic.customParams = {text: spaceType.text};
+        cosmic.anchor.setTo(0.5);
+
+        cosmic.inputEnabled = true; 
+        // cosmic.input.pixelPerfectClick = true; 
+        cosmic.events.onInputDown.add(self.animateSpaceObject, self);
+      });
+
+      this.currentSpaceObject = this.spaceObjectsGroup.next();
+      // make the current object centered
+      this.currentSpaceObject.position.set(this.game.world.centerX, this.game.world.centerY);
 
       // right arrow
       this.rightArrow = this.game.add.sprite(560, this.game.world.centerY, 'arrow');
