@@ -1,5 +1,10 @@
 (function() {
   'use strict';
+  // freesound.org
+  // look at license
+  // mp3 and ogg for android and ios
+  // use audacity to transform wav to above
+  // project rate - pick smallest but still sound good 22050
 
   // give game dimensions 640 x 360
   // phaser use WebGL or default to canvas if WebGL is not avail
@@ -67,9 +72,14 @@
       spaceTypes.forEach(function(spaceType) {
         // -1000 to make the objects be out of screen
         cosmic = self.spaceObjectsGroup.create(-1000, self.game.world.centerY, spaceType.key);
+        // sprites, add frame at the end
+        // cosmic = self.spaceObjectsGroup.create(-1000, self.game.world.centerY, spaceType.key), 0;
 
         cosmic.customParams = {text: spaceType.text};
         cosmic.anchor.setTo(0.5);
+
+        // create animation 'name', frame, fps, loop
+        // cosmic.animations.add('animate', [0,1,2,1,0,1], 3, false) 
 
         cosmic.inputEnabled = true; 
         // cosmic.input.pixelPerfectClick = true; 
@@ -79,6 +89,9 @@
       this.currentSpaceObject = this.spaceObjectsGroup.next();
       // make the current object centered
       this.currentSpaceObject.position.set(this.game.world.centerX, this.game.world.centerY);
+
+      // show text after current
+      this.showText(this.currentSpaceObject);
 
       // right arrow
       this.rightArrow = this.game.add.sprite(560, this.game.world.centerY, 'arrow');
@@ -115,6 +128,15 @@
     changeSpaceObject: function(sprite, event) {
       var newObject, endX;
 
+      if (this.isMoving) {
+        return false;
+      }
+
+      this.isMoving = true;
+
+      // hide text
+      this.spaceText.visible = false;
+
       if (sprite.customParams.direction > 0) {
         newObject = this.spaceObjectsGroup.next();
         // make the object come back in the screen from the correct position
@@ -131,6 +153,12 @@
       var newObjectMovement = game.add.tween(newObject);
       // default is 1000 1 sec
       newObjectMovement.to({x: this.game.world.centerX}, 1000);
+      // callback to execute when complete
+      newObjectMovement.onComplete.add(function() {
+        this.isMoving = false;
+        // show new text when animation is completed
+        this.showText(newObject);
+      }, this);
       newObjectMovement.start();
 
       var currentSpaceMovement = game.add.tween(this.currentSpaceObject);
@@ -142,7 +170,25 @@
       this.currentSpaceObject = newObject;
     },
     animateSpaceObject: function(sprite, event) {
-      console.log('animate space object');
+      // console.log('animate space object');
+      // sprite.play('animate');
+    },
+    showText: function(spacey) {
+      // if spaceText doesn't exist
+      if (!this.spaceText) {
+        var style = {
+          font: 'bold 30pt Arial',
+          fill: '#ffffff',
+          align: 'center'
+        }
+        // text object
+        // position x is middle y is 85%
+        this.spaceText = this.game.add.text(this.game.width/2, this.game.height * 0.85, '', style);
+        this.spaceText.anchor.setTo(0.5);
+      }
+
+      this.spaceText.setText(spacey.customParams.text);
+      this.spaceText.visible = true;
     }
   };
 
